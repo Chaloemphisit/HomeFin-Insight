@@ -190,6 +190,8 @@
                             oninput="app.updateData('currentRate', this.value)"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                             placeholder="0.00">
+                        <div class="mt-1 text-xs text-slate-400 italic" data-i18n="currentRateHint">Indicate current
+                            interest rate or adjusted rate in the 4th year</div>
                     </div>
                 </div>
                 <div class="bg-blue-50 px-5 py-3 border-t border-blue-100">
@@ -303,23 +305,45 @@
                         </div>
                     </div>
                     <div class="bg-white/5 p-4 border-t border-white/10">
-                        <button onclick="app.showShareModal()"
-                            class="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-2 rounded-lg transition border border-transparent shadow-lg mb-2 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
-                                </path>
-                            </svg>
-                            <span data-i18n="shareProject">Share Project</span>
-                        </button>
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="app.showSaveModal()"
-                                class="w-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2 rounded-lg transition border border-white/10">
-                                <span data-i18n="saveProject">Save</span>
+                            <button onclick="app.createNewProject()"
+                                class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-lg transition border border-white/10 flex flex-col items-center justify-center gap-1 group">
+                                <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                <span data-i18n="newProject">New Project</span>
                             </button>
                             <button onclick="app.showLoadModal()"
-                                class="w-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2 rounded-lg transition border border-white/10">
+                                class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-lg transition border border-white/10 flex flex-col items-center justify-center gap-1 group">
+                                <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
                                 <span data-i18n="loadProject">Load</span>
+                            </button>
+                            <button onclick="app.showSaveModal()"
+                                class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-lg transition border border-white/10 flex flex-col items-center justify-center gap-1 group">
+                                <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                    </path>
+                                </svg>
+                                <span data-i18n="saveProjectBtn">Save</span>
+                            </button>
+                            <button onclick="app.showShareModal()"
+                                class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-lg transition border border-white/10 flex flex-col items-center justify-center gap-1 group">
+                                <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                                    </path>
+                                </svg>
+                                <span data-i18n="shareProject">Share</span>
                             </button>
                         </div>
                     </div>
@@ -436,6 +460,7 @@
                 loanBalance: "ยอดหนี้คงเหลือ",
                 paymentPerMonth: "ผ่อนต่อเดือน",
                 currentRate: "ดอกเบี้ยปัจจุบัน (%)",
+                currentRateHint: "ระบุอัตราดอกเบี้ยเดิม หรือปีที่ 4 ที่มีการปรับขึ้น",
                 totalInterest3Y: "ดอกเบี้ยรวม 3 ปี (ปีที่ 4-6)",
                 totalInterest3Y: "ดอกเบี้ยรวม 3 ปี (ปีที่ 4-6)",
                 retentionOffer: "ข้อเสนอ Retention (ธนาคารเดิม)",
@@ -467,7 +492,17 @@
                 confirmDeleteBank: "ต้องการลบธนาคารนี้?",
                 confirmDeleteProject: "ต้องการลบโปรเจคนี้?",
                 projectSaved: "บันทึกข้อมูลเรียบร้อย",
+                projectSaved: "บันทึกข้อมูลเรียบร้อย",
                 projectUpdated: "อัพเดทข้อมูลเรียบร้อย",
+                projectSaved: "บันทึกข้อมูลเรียบร้อย",
+                projectUpdated: "อัพเดทข้อมูลเรียบร้อย",
+                projectLoaded: "โหลดข้อมูลเรียบร้อย",
+                projectCreated: "สร้างโปรเจคใหม่แล้ว",
+                newProject: "เริ่มใหม่",
+                projectCreated: "สร้างโปรเจคใหม่แล้ว",
+                newProject: "เริ่มใหม่",
+                confirmNewProject: "มีการเปลี่ยนแปลงที่ยังไม่บันทึก ต้องการสร้างใหม่หรือไม่?",
+                saveProjectBtn: "บันทึกข้อมูล",
                 refinanceSaving: "ประหยัดกว่าเดิม",
                 netSaving: "ประหยัดสุทธิ (หักค่าใช้จ่าย)",
                 bestOption: "ทางเลือกที่ดีที่สุด",
@@ -483,7 +518,7 @@
                 stampFee: "อากรแสตมป์ (0.05%)",
                 miscFee: "อื่นๆ",
                 totalCost: "รวมจ่าย",
-                onePercentHint: "[ว่าง=คำนวณ]"
+                onePercentHint: "เว้นว่าง = คำนวณอัตโนมัติ, 0 = ไม่มีค่าใช้จ่าย"
             },
             en: {
                 appTitle: "HomeFin Insight",
@@ -496,6 +531,7 @@
                 loanBalance: "Outstanding Balance",
                 paymentPerMonth: "Monthly Payment",
                 currentRate: "Current Interest Rate (%)",
+                currentRateHint: "Indicate current interest rate or adjusted rate in the 4th year",
                 totalInterest3Y: "Total Interest 3 Years",
                 totalInterest3Y: "Total Interest 3 Years",
                 retentionOffer: "Retention Offer",
@@ -528,6 +564,15 @@
                 confirmDeleteProject: "Delete this project?",
                 projectSaved: "Project Saved Successfully",
                 projectUpdated: "Project Updated Successfully",
+                projectSaved: "Project Saved Successfully",
+                projectUpdated: "Project Updated Successfully",
+                projectSaved: "Project Saved Successfully",
+                projectUpdated: "Project Updated Successfully",
+                projectLoaded: "Project Loaded Successfully",
+                projectCreated: "New Project Created",
+                newProject: "New Project",
+                confirmNewProject: "Discard unsaved changes and create new?",
+                saveProjectBtn: "Save Project",
                 refinanceSaving: "Gross Savings",
                 netSaving: "Net Savings",
                 bestOption: "Best Option",
@@ -543,13 +588,14 @@
                 stampFee: "Stamp Duty (0.05%)",
                 miscFee: "Misc Fees",
                 totalCost: "Total Cost",
-                onePercentHint: "[Empty=Calc]"
+                onePercentHint: "Empty = Auto-cal, 0 = No fee"
             }
         };
 
         const app = {
             lang: localStorage.getItem('mortgage_lang') || 'th',
             loadedProjectIndex: -1, // Track currently loaded project
+            isDirty: false,
             data: {
                 currentBalance: 0,
                 monthlyPayment: 0,
@@ -565,12 +611,25 @@
             init() {
                 this.loadFromUrl(); // Check URL first
                 if (!this.loadedFromUrl) {
-                    this.loadFromStorage();
+                    // Try to load last active project
+                    const lastIndex = localStorage.getItem('mortgage_last_project');
+                    if (lastIndex !== null) {
+                        this.loadProject(parseInt(lastIndex), true); // true = silent/init load
+                    }
+                    // If no last project or failed, start clean (default)
                 } else {
-                    this.populateInputs(); // FIX: Update DOM inputs from loaded data
+                    this.populateInputs(); // Update DOM inputs from loaded data
                 }
                 this.calculateData();
                 this.render(); // Initial global render
+
+                // Warn on unsaved changes
+                window.addEventListener('beforeunload', (e) => {
+                    if (this.isDirty) {
+                        e.preventDefault();
+                        e.returnValue = '';
+                    }
+                });
             },
 
             toggleLang() {
@@ -593,6 +652,7 @@
 
             updateData(field, value) {
                 this.data[field] = parseFloat(value) || 0;
+                this.isDirty = true;
                 this.calculateData();
                 this.updateValues();
             },
@@ -607,6 +667,7 @@
                     } else if (field === 'feeMortgage' || field === 'feeStamp') {
                         bank[field] = parseFloat(value) || 0;
                     }
+                    this.isDirty = true;
                     this.calculateData();
                     this.updateValues(); // Update ONLY the numbers/CSS, don't redraw HTML
                 }
@@ -624,6 +685,7 @@
                     feeStamp: null, // Null means auto-calculate 0.05%
                     feeOther: 0
                 });
+                this.isDirty = true;
                 this.calculateData();
                 this.render(); // Must redraw for new element
             },
@@ -634,6 +696,7 @@
                     this.lang === 'th' ? 'ต้องการลบธนาคารนี้?' : 'Delete this bank?',
                     () => {
                         this.data.banks = this.data.banks.filter(b => b.id !== id);
+                        this.isDirty = true;
                         this.calculateData();
                         this.render();
                         this.showToast(this.lang === 'th' ? 'ลบธนาคารแล้ว' : 'Bank Removed', 'success');
@@ -813,8 +876,15 @@
                         card.id = `bank-card-${bank.id}`;
                         card.className = `bg-white rounded-xl shadow-sm border ${isBest ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'} overflow-hidden transition hover:shadow-md`;
 
+
                         const valFeeMortgage = (bank.feeMortgage === null) ? '' : bank.feeMortgage;
                         const valFeeStamp = (bank.feeStamp === null) ? '' : bank.feeStamp;
+
+                        // Calculate placeholders
+                        const autoMortgage = this.data.currentBalance * 0.01;
+                        const autoStamp = this.data.currentBalance * 0.0005;
+                        const phMortgage = `1% (${this.formatMoney(autoMortgage)})`;
+                        const phStamp = `0.05% (${this.formatMoney(autoStamp)})`;
 
                         card.innerHTML = `
                             <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -853,16 +923,19 @@
                                         </div>
                                         <div>
                                             <label class="block text-[10px] text-slate-400 mb-1">${this.t('mortgageFee')}</label>
-                                            <input type="number" value="${valFeeMortgage}" placeholder="1%" oninput="app.updateBank(${bank.id}, 'feeMortgage', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                            <input type="number" value="${valFeeMortgage}" placeholder="${phMortgage}" oninput="app.updateBank(${bank.id}, 'feeMortgage', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] text-slate-400 mb-1">${this.t('stampFee')}</label>
-                                            <input type="number" value="${valFeeStamp}" placeholder="0.05%" oninput="app.updateBank(${bank.id}, 'feeStamp', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                            <input type="number" value="${valFeeStamp}" placeholder="${phStamp}" oninput="app.updateBank(${bank.id}, 'feeStamp', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] text-slate-400 mb-1">${this.t('miscFee')}</label>
                                             <input type="number" value="${bank.feeOther || 0}" oninput="app.updateBank(${bank.id}, 'feeOther', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
                                         </div>
+                                    </div>
+                                    <div class="mt-1 text-[10px] text-slate-400 text-right italic">
+                                        * ${this.t('onePercentHint')}
                                     </div>
                                 </div>
 
@@ -960,12 +1033,52 @@
 
                 localStorage.setItem('mortgage_projects', JSON.stringify(projects));
 
+                // Save last loaded index
+                localStorage.setItem('mortgage_last_project', this.loadedProjectIndex);
+                this.isDirty = false;
+
                 document.getElementById('saveModal').classList.add('hidden');
                 document.getElementById('projectName').value = '';
             },
 
+            createNewProject() {
+                if (this.isDirty) {
+                    this.showConfirmDialog(
+                        this.lang === 'th' ? 'สร้างโปรเจคใหม่' : 'New Project',
+                        this.t('confirmNewProject'),
+                        () => this.performReset()
+                    );
+                } else {
+                    this.performReset();
+                }
+            },
+
+            performReset() {
+                this.data = {
+                    currentBalance: 0,
+                    monthlyPayment: 0,
+                    currentRate: 0,
+                    currentRate: 0,
+                    retentionRate1: 0,
+                    retentionRate2: 0,
+                    retentionRate3: 0,
+                    retentionFee: 0,
+                    banks: []
+                };
+                this.loadedProjectIndex = -1;
+                this.isDirty = false;
+
+                // Clear persistent session pointers
+                localStorage.removeItem('mortgage_last_project');
+
+                this.populateInputs();
+                this.calculateData();
+                this.render();
+                this.showToast(this.t('projectCreated'), 'success');
+            },
+
             loadFromStorage() {
-                // Try to restore last state if exists? Or just init clean
+                // Deprecated in favor of direct load in init
             },
 
             showSaveModal() {
@@ -1041,15 +1154,22 @@
             loadProject(index) {
                 const projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
                 if (projects[index]) {
-                    this.loadedProjectIndex = index; // FIX: Track loaded index
                     this.data = projects[index].data;
                     this.lang = projects[index].lang || 'th';
                     localStorage.setItem('mortgage_lang', this.lang);
 
+                    // Update input fields
                     this.populateInputs();
 
                     this.calculateData();
-                    this.render(); // Need full render because input values in list might have changed
+                    this.render();
+                    this.showToast(this.t('projectLoaded'), 'success'); // Re-use message or say Loaded
+
+                    // Track loaded project
+                    this.loadedProjectIndex = index;
+                    localStorage.setItem('mortgage_last_project', index);
+                    this.isDirty = false;
+
                     document.getElementById('loadModal').classList.add('hidden');
                 }
             },
