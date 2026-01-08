@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeFin Insight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#2563eb', // Blue 600
+                        secondary: '#4f46e5', // Indigo 600
+                        success: '#16a34a', // Green 600
+                        danger: '#dc2626', // Red 600
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for cards */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast Animation */
+        @keyframes slideInBottom {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .toast-enter {
+            animation: slideInBottom 0.3s ease-out forwards;
+        }
+
+        .toast-exit {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                    </path>
+                </svg>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight" data-i18n="appTitle">Mortgage Tool</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="app.toggleLang()"
+                    class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-sm font-medium transition backdrop-blur-sm border border-white/10 shadow-sm">
+                    <span id="lang-display">TH | EN</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+
+        <!-- Left Column: Inputs & Retention (3 cols) -->
+        <div class="lg:col-span-3 space-y-6">
+
+            <!-- Existing Loan -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in">
+                <div class="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <h2 class="font-semibold text-slate-700 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                        <span data-i18n="currentLoan">Existing Loan</span>
+                    </h2>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="loanBalance">Outstanding
+                            Balance</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-slate-400">฿</span>
+                            <input type="number" id="currentBalance"
+                                oninput="app.updateData('currentBalance', this.value)"
+                                class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="0.00">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="paymentPerMonth">Monthly
+                            Payment</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-slate-400">฿</span>
+                            <input type="number" id="monthlyPayment"
+                                oninput="app.updateData('monthlyPayment', this.value)"
+                                class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                placeholder="0.00">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="currentRate">Current
+                            Rate (%)</label>
+                        <input type="number" step="0.01" id="currentRate"
+                            oninput="app.updateData('currentRate', this.value)"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            placeholder="0.00">
+                    </div>
+                </div>
+                <div class="bg-blue-50 px-5 py-3 border-t border-blue-100">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-blue-700 font-medium" data-i18n="totalInterest3Y">Total Interest (3Y)</span>
+                        <span class="text-blue-800 font-bold text-lg" id="baseInterestDisplay">฿0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Retention Offer -->
+            <section
+                class="bg-indigo-50/50 rounded-2xl shadow-sm border border-indigo-100 overflow-hidden animate-fade-in"
+                style="animation-delay: 0.2s">
+                <div class="bg-indigo-50 px-5 py-3 border-b border-indigo-100">
+                    <h2 class="font-semibold text-indigo-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
+                        <span data-i18n="retentionOffer">Retention (Same Bank)</span>
+                    </h2>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-indigo-800 mb-1" data-i18n="year1">Year 1</label>
+                            <input type="number" step="0.01" id="retentionRate1"
+                                oninput="app.updateData('retentionRate1', this.value)"
+                                class="w-full px-2 py-1.5 text-sm border border-indigo-200 rounded focus:border-indigo-500 outline-none text-center"
+                                placeholder="%">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-indigo-800 mb-1" data-i18n="year2">Year 2</label>
+                            <input type="number" step="0.01" id="retentionRate2"
+                                oninput="app.updateData('retentionRate2', this.value)"
+                                class="w-full px-2 py-1.5 text-sm border border-indigo-200 rounded focus:border-indigo-500 outline-none text-center"
+                                placeholder="%">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-indigo-800 mb-1" data-i18n="year3">Year 3</label>
+                            <input type="number" step="0.01" id="retentionRate3"
+                                oninput="app.updateData('retentionRate3', this.value)"
+                                class="w-full px-2 py-1.5 text-sm border border-indigo-200 rounded focus:border-indigo-500 outline-none text-center"
+                                placeholder="%">
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="block text-xs text-indigo-800 mb-1" data-i18n="retentionFee">Retention Fee</label>
+                        <input type="number" id="retentionFee" oninput="app.updateData('retentionFee', this.value)"
+                            class="w-full px-2 py-1.5 text-sm border border-indigo-200 rounded focus:border-indigo-500 outline-none text-right"
+                            placeholder="0.00">
+                    </div>
+                </div>
+                <div class="px-5 pb-3">
+                    <div class="flex justify-between text-sm py-1 border-gray-100">
+                        <span class="text-slate-500" data-i18n="interest3Y">Interest 3Y</span>
+                        <span class="font-semibold text-slate-700" id="retentionInterest">฿0</span>
+                    </div>
+                    <div class="flex justify-between text-sm py-1">
+                        <span class="text-indigo-600 font-medium" data-i18n="savings">Savings</span>
+                        <span class="font-bold text-indigo-700" id="retentionSavings">฿0</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Middle Column: Refinance Banks (6 cols) -->
+        <div class="lg:col-span-6 space-y-6">
+            <div class="flex justify-between items-end">
+                <h2 class="text-lg font-bold text-slate-800" data-i18n="refinanceOptions">Refinance Options</h2>
+                <button onclick="app.addBank()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span data-i18n="addBank">Add Bank</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Bank List -->
+            <div id="bankList" class="space-y-4">
+                <!-- Banks will be injected here via JS -->
+                <div
+                    class="text-center py-12 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-300">
+                    <p data-i18n="noBanks">No banks added yet. Click "Add Bank" to compare.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Summary (3 cols) -->
+        <div class="lg:col-span-3 space-y-6">
+            <div class="lg:sticky lg:top-24 space-y-6">
+                <!-- Summary Card -->
+                <section class="bg-slate-900 text-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+                    <div class="p-6">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
+                            </svg>
+                            <span data-i18n="summaryResult">Recommendation</span>
+                        </h2>
+
+                        <div id="summaryContent" class="space-y-4">
+                            <!-- Dynamic Summary Content -->
+                            <div class="opacity-70 text-sm italic" data-i18n="awaitingInput">Enter data to see
+                                comparison...</div>
+                        </div>
+                    </div>
+                    <div class="bg-white/5 p-4 border-t border-white/10">
+                        <button onclick="app.showShareModal()"
+                            class="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-2 rounded-lg transition border border-transparent shadow-lg mb-2 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                                </path>
+                            </svg>
+                            <span data-i18n="shareProject">Share Project</span>
+                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="app.showSaveModal()"
+                                class="w-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2 rounded-lg transition border border-white/10">
+                                <span data-i18n="saveProject">Save</span>
+                            </button>
+                            <button onclick="app.showLoadModal()"
+                                class="w-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2 rounded-lg transition border border-white/10">
+                                <span data-i18n="loadProject">Load</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Save Modal -->
+    <div id="saveModal"
+        class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-fade-in">
+            <h3 class="text-lg font-bold text-slate-800 mb-4" data-i18n="saveProjectTitle">Save Project</h3>
+            <input type="text" id="projectName"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="My Home Loan 2026">
+
+            <div class="flex flex-col gap-2">
+                <div class="flex gap-2 justify-end">
+                    <button onclick="document.getElementById('saveModal').classList.add('hidden')"
+                        class="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm font-medium"
+                        data-i18n="cancel">Cancel</button>
+                    <!-- Update Button (Hidden by default) -->
+                    <button id="btnUpdateProject" onclick="app.saveProject(false)"
+                        class="hidden px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"
+                        data-i18n="update">Update</button>
+                    <!-- Save New Button -->
+                    <button id="btnSaveNewProject" onclick="app.saveProject(true)"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
+                        data-i18n="save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Modal -->
+    <div id="loadModal"
+        class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 animate-fade-in max-h-[80vh] flex flex-col">
+            <h3 class="text-lg font-bold text-slate-800 mb-4" data-i18n="loadProjectTitle">Load Project</h3>
+            <div id="savedProjectsList" class="flex-1 overflow-y-auto space-y-2 mb-4 -mx-2 px-2">
+                <!-- Projects List -->
+            </div>
+            <div class="flex justify-end pt-4 border-t border-slate-100">
+                <button onclick="document.getElementById('loadModal').classList.add('hidden')"
+                    class="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm font-medium"
+                    data-i18n="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal"
+        class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-fade-in text-center">
+            <h3 class="text-lg font-bold text-slate-800 mb-2" data-i18n="shareProjectTitle">Share Project</h3>
+            <p class="text-xs text-slate-500 mb-4" data-i18n="shareDesc">Scan QR code or copy link to share</p>
+
+            <div
+                class="flex justify-center mb-4 p-2 bg-white rounded-lg border border-slate-100 shadow-inner inline-block mx-auto">
+                <canvas id="qrCanvas"></canvas>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="shareUrlInput"
+                    class="w-full px-3 py-2 text-xs border border-slate-300 rounded bg-slate-50 text-slate-500"
+                    readonly>
+                <button onclick="app.copyShareUrl()"
+                    class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-medium transition"
+                    data-i18n="copy">Copy</button>
+            </div>
+
+            <div class="flex justify-center">
+                <button onclick="document.getElementById('shareModal').classList.add('hidden')"
+                    class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition"
+                    data-i18n="close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"
+        class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[60] flex flex-col gap-2 w-full max-w-sm pointer-events-none px-4">
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal"
+        class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-fade-in relative">
+            <h3 id="confirmTitle" class="text-lg font-bold text-slate-800 mb-2">Confirm Action</h3>
+            <p id="confirmMessage" class="text-sm text-slate-500 mb-6">Are you sure?</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="app.closeConfirmModal()"
+                    class="px-4 py-2 text-slate-600 hover:text-slate-800 text-sm font-medium transition"
+                    data-i18n="cancel">Cancel</button>
+                <button id="confirmBtn"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition shadow-sm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const translations = {
+            th: {
+                appTitle: "HomeFin Insight",
+                shareProject: "แชร์โปรเจค",
+                shareProjectTitle: "แชร์ข้อมูล",
+                shareDesc: "สแกน QR Code หรือคัดลอกลิงก์เพื่อส่งต่อ",
+                copy: "คัดลอก",
+                copied: "คัดลอกแล้ว!",
+                currentLoan: "ข้อมูลสินเชื่อเดิม",
+                loanBalance: "ยอดหนี้คงเหลือ",
+                paymentPerMonth: "ผ่อนต่อเดือน",
+                currentRate: "ดอกเบี้ยปัจจุบัน (%)",
+                totalInterest3Y: "ดอกเบี้ยรวม 3 ปี (ปีที่ 4-6)",
+                totalInterest3Y: "ดอกเบี้ยรวม 3 ปี (ปีที่ 4-6)",
+                retentionOffer: "ข้อเสนอ Retention (ธนาคารเดิม)",
+                retentionFee: "ค่าธรรมเนียม Retention",
+                year1: "ปีที่ 1 (%)",
+                year2: "ปีที่ 2 (%)",
+                year3: "ปีที่ 3 (%)",
+                interest3Y: "ดอกเบี้ยรวม 3 ปี",
+                savings: "ประหยัดได้",
+                refinanceOptions: "ตัวเลือก Refinance",
+                addBank: "เพิ่มธนาคาร",
+                noBanks: "ยังไม่มีธนาคาร กด 'เพิ่มธนาคาร' เพื่อเปรียบเทียบ",
+                summaryResult: "สรุปผลการเปรียบเทียบ",
+                awaitingInput: "กรุณากรอกข้อมูลเพื่อดูผลวิเคราะห์...",
+                saveProject: "บันทึกโปรเจค",
+                loadProject: "โหลดโปรเจค",
+                saveProjectTitle: "บันทึกข้อมูล",
+                loadProjectTitle: "รายการที่บันทึกไว้",
+                cancel: "ยกเลิก",
+                save: "บันทึก",
+                saveNew: "บันทึกไฟล์ใหม่",
+                update: "อัพเดท",
+                close: "ปิด",
+                bankName: "ชื่อธนาคาร",
+                close: "ปิด",
+                bankName: "ชื่อธนาคาร",
+                remove: "ลบ",
+                confirmDelete: "ยืนยันการลบ?",
+                confirmDeleteBank: "ต้องการลบธนาคารนี้?",
+                confirmDeleteProject: "ต้องการลบโปรเจคนี้?",
+                projectSaved: "บันทึกข้อมูลเรียบร้อย",
+                projectUpdated: "อัพเดทข้อมูลเรียบร้อย",
+                refinanceSaving: "ประหยัดกว่าเดิม",
+                netSaving: "ประหยัดสุทธิ (หักค่าใช้จ่าย)",
+                bestOption: "ทางเลือกที่ดีที่สุด",
+                retentionWin: "Retention คุ้มกว่า",
+                refinanceWin: "Refinance คุ้มกว่า",
+                recommendationRefinance: "รีไฟแนนซ์ไป <strong>{bank}</strong> คุ้มที่สุด",
+                recommendationRetention: "ทำ <strong>Retention</strong> กับธนาคารเดิมคุ้มกว่า",
+                savingAmount: "ประหยัดเงินได้ <strong>{amount}</strong> ใน 3 ปี",
+                savingVsRetention: "ดีกว่า Retention <strong>{amount}</strong>",
+                costs: "ค่าใช้จ่ายรีไฟแนนซ์",
+                appraisalFee: "ค่าประเมิน",
+                mortgageFee: "จดจำนอง (1%)",
+                stampFee: "อากรแสตมป์ (0.05%)",
+                miscFee: "อื่นๆ",
+                totalCost: "รวมจ่าย",
+                onePercentHint: "[ว่าง=คำนวณ]"
+            },
+            en: {
+                appTitle: "HomeFin Insight",
+                shareProject: "Share Project",
+                shareProjectTitle: "Share Project",
+                shareDesc: "Scan QR code or copy link to share",
+                copy: "Copy",
+                copied: "Copied!",
+                currentLoan: "Current Loan",
+                loanBalance: "Outstanding Balance",
+                paymentPerMonth: "Monthly Payment",
+                currentRate: "Current Interest Rate (%)",
+                totalInterest3Y: "Total Interest 3 Years",
+                totalInterest3Y: "Total Interest 3 Years",
+                retentionOffer: "Retention Offer",
+                retentionFee: "Retention Fee",
+                year1: "Year 1 (%)",
+                year2: "Year 2 (%)",
+                year3: "Year 3 (%)",
+                interest3Y: "Interest (3Y)",
+                savings: "Gross Savings",
+                refinanceOptions: "Refinance Options",
+                addBank: "Add Bank",
+                noBanks: "No banks added. Click 'Add Bank' to compare.",
+                summaryResult: "Recommendation",
+                awaitingInput: "Enter details to see analysis...",
+                saveProject: "Save Project",
+                loadProject: "Load Project",
+                saveProjectTitle: "Save Project",
+                loadProjectTitle: "Saved Projects",
+                cancel: "Cancel",
+                save: "Save",
+                saveNew: "Save New",
+                update: "Update",
+                close: "Close",
+                bankName: "Bank Name",
+                close: "Close",
+                bankName: "Bank Name",
+                remove: "Remove",
+                confirmDelete: "Confirm Delete",
+                confirmDeleteBank: "Delete this bank?",
+                confirmDeleteProject: "Delete this project?",
+                projectSaved: "Project Saved Successfully",
+                projectUpdated: "Project Updated Successfully",
+                refinanceSaving: "Gross Savings",
+                netSaving: "Net Savings",
+                bestOption: "Best Option",
+                retentionWin: "Retention Wins",
+                refinanceWin: "Refinance Wins",
+                recommendationRefinance: "Refinancing to <strong>{bank}</strong> is best.",
+                recommendationRetention: "Stick with <strong>Retention</strong>.",
+                savingAmount: "Saves <strong>{amount}</strong> over 3 years",
+                savingVsRetention: "Beats Retention by <strong>{amount}</strong>",
+                costs: "Refinance Costs",
+                appraisalFee: "Appraisal",
+                mortgageFee: "Mortgage (1%)",
+                stampFee: "Stamp Duty (0.05%)",
+                miscFee: "Misc Fees",
+                totalCost: "Total Cost",
+                onePercentHint: "[Empty=Calc]"
+            }
+        };
+
+        const app = {
+            lang: localStorage.getItem('mortgage_lang') || 'th',
+            loadedProjectIndex: -1, // Track currently loaded project
+            data: {
+                currentBalance: 0,
+                monthlyPayment: 0,
+                currentRate: 0,
+                currentRate: 0,
+                retentionRate1: 0,
+                retentionRate2: 0,
+                retentionRate3: 0,
+                retentionFee: 0,
+                banks: []
+            },
+
+            init() {
+                this.loadFromUrl(); // Check URL first
+                if (!this.loadedFromUrl) {
+                    this.loadFromStorage();
+                } else {
+                    this.populateInputs(); // FIX: Update DOM inputs from loaded data
+                }
+                this.calculateData();
+                this.render(); // Initial global render
+            },
+
+            toggleLang() {
+                this.lang = this.lang === 'th' ? 'en' : 'th';
+                localStorage.setItem('mortgage_lang', this.lang);
+                this.render();
+            },
+
+            t(key, params = {}) {
+                let text = translations[this.lang][key] || key;
+                for (const [k, v] of Object.entries(params)) {
+                    text = text.replace(`{${k}}`, v);
+                }
+                return text;
+            },
+
+            formatMoney(amount) {
+                return '฿' + (Number(amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            },
+
+            updateData(field, value) {
+                this.data[field] = parseFloat(value) || 0;
+                this.calculateData();
+                this.updateValues();
+            },
+
+            updateBank(id, field, value) {
+                const bank = this.data.banks.find(b => b.id === id);
+                if (bank) {
+                    bank[field] = field === 'name' ? value : (parseFloat(value) || 0);
+                    // Handle empty inputs for auto-calc
+                    if ((field === 'feeMortgage' || field === 'feeStamp') && value === '') {
+                        bank[field] = null; // Mark as null/empty
+                    } else if (field === 'feeMortgage' || field === 'feeStamp') {
+                        bank[field] = parseFloat(value) || 0;
+                    }
+                    this.calculateData();
+                    this.updateValues(); // Update ONLY the numbers/CSS, don't redraw HTML
+                }
+            },
+
+            addBank() {
+                this.data.banks.push({
+                    id: Date.now(),
+                    name: '',
+                    rate1: 0,
+                    rate2: 0,
+                    rate3: 0,
+                    feeAppraisal: 0,
+                    feeMortgage: null, // Null means auto-calculate 1%
+                    feeStamp: null, // Null means auto-calculate 0.05%
+                    feeOther: 0
+                });
+                this.calculateData();
+                this.render(); // Must redraw for new element
+            },
+
+            removeBank(id) {
+                this.showConfirmDialog(
+                    this.lang === 'th' ? 'ลบธนาคาร' : 'Delete Bank',
+                    this.lang === 'th' ? 'ต้องการลบธนาคารนี้?' : 'Delete this bank?',
+                    () => {
+                        this.data.banks = this.data.banks.filter(b => b.id !== id);
+                        this.calculateData();
+                        this.render();
+                        this.showToast(this.lang === 'th' ? 'ลบธนาคารแล้ว' : 'Bank Removed', 'success');
+                    }
+                );
+            },
+
+            // --- Calculation Engine ---
+            calculateInterest(balance, rate1, rate2, rate3) {
+                let principal = this.data.currentBalance;
+                let totalInterest = 0;
+                const rates = [rate1, rate2, rate3];
+                const monthlyPmt = this.data.monthlyPayment || (principal * 0.006);
+
+                for (let year = 0; year < 3; year++) {
+                    let r = rates[year] / 100 / 12;
+                    for (let m = 0; m < 12; m++) {
+                        let interest = principal * r;
+                        let principalPaid = monthlyPmt - interest;
+                        if (principalPaid < 0) principalPaid = 0;
+                        totalInterest += interest;
+                        principal -= principalPaid;
+                        if (principal <= 0) break;
+                    }
+                }
+                return totalInterest;
+            },
+
+            calculateData() {
+                // 1. Base Interest
+                this.results = {};
+                this.results.baseInterest = this.calculateInterest(
+                    this.data.currentBalance,
+                    this.data.currentRate,
+                    this.data.currentRate,
+                    this.data.currentRate
+                );
+
+                // 2. Retention
+                this.results.retentionInterest = this.calculateInterest(
+                    this.data.currentBalance,
+                    this.data.retentionRate1,
+                    this.data.retentionRate2,
+                    this.data.retentionRate3
+                );
+                this.results.retentionSavings = this.results.baseInterest - this.results.retentionInterest - (this.data.retentionFee || 0);
+
+                // 3. Banks
+                this.results.banks = this.data.banks.map(bank => {
+                    // Calculate costs per bank
+                    let mortgageCost = bank.feeMortgage;
+                    if (mortgageCost === null || isNaN(mortgageCost)) {
+                        mortgageCost = Math.min(this.data.currentBalance * 0.01, 200000); // Max 200k usually implies for Mortgage Registration
+                    }
+
+                    let stampCost = bank.feeStamp;
+                    if (stampCost === null || isNaN(stampCost)) {
+                        stampCost = this.data.currentBalance * 0.0005; // 0.05%
+                    }
+
+                    const totalCost = (bank.feeAppraisal || 0) + (mortgageCost || 0) + (stampCost || 0) + (bank.feeOther || 0);
+
+                    const interest = this.calculateInterest(
+                        this.data.currentBalance,
+                        bank.rate1,
+                        bank.rate2,
+                        bank.rate3
+                    );
+                    const grossSavings = this.results.baseInterest - interest;
+                    const netSavings = grossSavings - totalCost;
+                    const advantageOverRetention = netSavings - this.results.retentionSavings;
+
+                    return {
+                        id: bank.id,
+                        interest,
+                        grossSavings,
+                        netSavings,
+                        advantageOverRetention,
+                        totalCost,
+                        mortgageCostDisplay: mortgageCost
+                    };
+                });
+
+                // Sort results by net savings descending (Logic only, does not reorder data.banks)
+                this.results.banks.sort((a, b) => b.netSavings - a.netSavings);
+            },
+
+            // Updates ONLY the text values and styling, NOT the DOM structure
+            updateValues() {
+                // Update Global Results Numbers
+                document.getElementById('baseInterestDisplay').textContent = this.formatMoney(this.results?.baseInterest || 0);
+
+                document.getElementById('retentionInterest').textContent = this.formatMoney(this.results?.retentionInterest || 0);
+                const retSavingsEl = document.getElementById('retentionSavings');
+                retSavingsEl.textContent = this.formatMoney(this.results?.retentionSavings || 0);
+                if ((this.results?.retentionSavings || 0) < 0) {
+                    retSavingsEl.className = "font-bold text-danger"; // Red if negative
+                } else {
+                    retSavingsEl.className = (this.results?.retentionSavings > 0) ? "font-bold text-success" : "font-bold text-slate-700";
+                }
+
+                // Update Bank Cards (Target by ID)
+                const bestBankId = this.results.banks[0]?.id;
+                const isRefinanceWin = this.results.banks[0]?.netSavings > this.results.retentionSavings;
+
+                this.data.banks.forEach(bank => {
+                    const res = this.results.banks.find(r => r.id === bank.id);
+                    if (!res) return;
+
+                    // Text updates
+                    const elInterest = document.getElementById(`res-interest-${bank.id}`);
+                    if (elInterest) elInterest.textContent = this.formatMoney(res.interest);
+
+                    const elGross = document.getElementById(`res-gross-${bank.id}`);
+                    if (elGross) elGross.textContent = this.formatMoney(res.grossSavings);
+
+                    const elNet = document.getElementById(`res-net-${bank.id}`);
+                    if (elNet) {
+                        elNet.textContent = this.formatMoney(res.netSavings);
+                        if (res.netSavings < 0) {
+                            elNet.className = "font-bold text-danger text-base";
+                        } else {
+                            elNet.className = "font-bold text-success text-base";
+                        }
+                    }
+
+                    const elCost = document.getElementById(`res-totalcost-${bank.id}`);
+                    if (elCost) {
+                        elCost.innerHTML = `${this.t('costs')} <span class="text-slate-400 font-normal">(${this.formatMoney(res.totalCost)})</span>`;
+                    }
+
+                    // Best Option Styling
+                    const card = document.getElementById(`bank-card-${bank.id}`);
+                    const isBest = (bank.id === bestBankId) && isRefinanceWin;
+
+                    if (card) {
+                        if (isBest) {
+                            card.classList.add('border-blue-500', 'ring-1', 'ring-blue-500');
+                            card.classList.remove('border-slate-200');
+                        } else {
+                            card.classList.remove('border-blue-500', 'ring-1', 'ring-blue-500');
+                            card.classList.add('border-slate-200');
+                        }
+                    }
+                });
+
+                this.renderSummary();
+            },
+
+            render() {
+                // Update Static Texts
+                document.getElementById('lang-display').textContent = this.lang === 'th' ? '🇺🇸 EN' : '🇹🇭 TH';
+                document.title = this.t('appTitle');
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    el.textContent = this.t(key);
+                });
+
+                // Update Global Numbers (Initial)
+                this.updateValues();
+
+                // Render Banks (Structure)
+                const list = document.getElementById('bankList');
+                list.innerHTML = '';
+
+                if (this.data.banks.length === 0) {
+                    list.innerHTML = `<div class="text-center py-12 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-300"><p>${this.t('noBanks')}</p></div>`;
+                } else {
+                    this.data.banks.forEach((bank, index) => {
+                        const res = this.results.banks.find(r => r.id === bank.id);
+                        const isRefinanceWin = this.results.banks[0]?.netSavings > this.results.retentionSavings;
+                        // Use result-based sorting to determine best, but render in data order
+                        const isBest = (bank.id === this.results.banks[0]?.id) && isRefinanceWin;
+
+                        const card = document.createElement('div');
+                        card.id = `bank-card-${bank.id}`;
+                        card.className = `bg-white rounded-xl shadow-sm border ${isBest ? 'border-blue-500 ring-1 ring-blue-500' : 'border-slate-200'} overflow-hidden transition hover:shadow-md`;
+
+                        const valFeeMortgage = (bank.feeMortgage === null) ? '' : bank.feeMortgage;
+                        const valFeeStamp = (bank.feeStamp === null) ? '' : bank.feeStamp;
+
+                        card.innerHTML = `
+                            <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                                <input type="text" value="${bank.name}" placeholder="${this.t('bankName')}" 
+                                    oninput="app.updateBank(${bank.id}, 'name', this.value)"
+                                    class="bg-transparent font-semibold text-slate-700 focus:outline-none focus:border-b border-slate-400 w-1/2"
+                                >
+                                <button onclick="app.removeBank(${bank.id})" class="text-slate-400 hover:text-red-500 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <!-- Interest Rates -->
+                                <div class="grid grid-cols-3 gap-2 mb-4">
+                                     <div>
+                                        <label class="block text-xs text-slate-500 mb-1">${this.t('year1')}</label>
+                                        <input type="number" step="0.01" value="${bank.rate1}" oninput="app.updateBank(${bank.id}, 'rate1', this.value)" class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded focus:border-blue-500 outline-none text-center">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-slate-500 mb-1">${this.t('year2')}</label>
+                                        <input type="number" step="0.01" value="${bank.rate2}" oninput="app.updateBank(${bank.id}, 'rate2', this.value)" class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded focus:border-blue-500 outline-none text-center">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-slate-500 mb-1">${this.t('year3')}</label>
+                                        <input type="number" step="0.01" value="${bank.rate3}" oninput="app.updateBank(${bank.id}, 'rate3', this.value)" class="w-full px-2 py-1.5 text-sm border border-slate-200 rounded focus:border-blue-500 outline-none text-center">
+                                    </div>
+                                </div>
+                                
+                                <!-- Refinance Costs per Bank -->
+                                <div class="mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                    <h4 id="res-totalcost-${bank.id}" class="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">${this.t('costs')} <span class="text-slate-400 font-normal">(${this.formatMoney(res.totalCost)})</span></h4>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <div>
+                                            <label class="block text-[10px] text-slate-400 mb-1">${this.t('appraisalFee')}</label>
+                                            <input type="number" value="${bank.feeAppraisal || 0}" oninput="app.updateBank(${bank.id}, 'feeAppraisal', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] text-slate-400 mb-1">${this.t('mortgageFee')}</label>
+                                            <input type="number" value="${valFeeMortgage}" placeholder="1%" oninput="app.updateBank(${bank.id}, 'feeMortgage', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] text-slate-400 mb-1">${this.t('stampFee')}</label>
+                                            <input type="number" value="${valFeeStamp}" placeholder="0.05%" oninput="app.updateBank(${bank.id}, 'feeStamp', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] text-slate-400 mb-1">${this.t('miscFee')}</label>
+                                            <input type="number" value="${bank.feeOther || 0}" oninput="app.updateBank(${bank.id}, 'feeOther', this.value)" class="w-full px-2 py-1 text-xs border border-slate-200 rounded text-center">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 text-sm pt-2 border-t border-dashed border-slate-100">
+                                    <div class="flex justify-between">
+                                        <span class="text-slate-500">${this.t('interest3Y')}</span>
+                                        <span id="res-interest-${bank.id}" class="font-medium">${this.formatMoney(res.interest)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-600">${this.t('refinanceSaving')}</span>
+                                        <span id="res-gross-${bank.id}" class="font-medium text-blue-700">${this.formatMoney(res.grossSavings)}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center bg-blue-50/50 p-2 rounded">
+                                        <span class="font-bold text-slate-700 text-xs uppercase tracking-wide">${this.t('netSaving')}</span>
+                                        <span id="res-net-${bank.id}" class="font-bold text-success text-base">${this.formatMoney(res.netSavings)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    });
+                }
+
+                this.renderSummary();
+            },
+
+            renderSummary() {
+                const container = document.getElementById('summaryContent');
+                if (!this.results || !this.results.banks || this.results.banks.length === 0) {
+                    container.innerHTML = `<div class="opacity-70 text-sm italic">${this.t('awaitingInput')}</div>`;
+                    return;
+                }
+
+                const bestBank = this.results.banks[0]; // Already sorted
+                const retSavings = this.results.retentionSavings;
+
+                let html = '';
+
+                if (bestBank.netSavings > retSavings) {
+                    // Refinance Wins
+                    const diff = bestBank.netSavings - retSavings;
+                    const bankName = this.data.banks.find(b => b.id === bestBank.id).name || 'Bank';
+
+                    html = `
+                        <div class="bg-success/10 border border-success/20 rounded-lg p-4 mb-2">
+                             <div class="text-success font-bold text-lg mb-1">${this.t('refinanceWin')} 🚀</div>
+                             <p class="text-sm text-slate-300 mb-2">${this.t('recommendationRefinance', { bank: bankName })}</p>
+                             <div class="text-2xl font-bold text-white mb-1">${this.formatMoney(bestBank.netSavings)}</div>
+                             <div class="text-xs text-green-300 bg-green-900/30 inline-block px-2 py-1 rounded">
+                                ${this.t('savingVsRetention', { amount: this.formatMoney(diff) })}
+                             </div>
+                        </div>
+                    `;
+                } else {
+                    // Retention Wins
+                    const diff = retSavings - (bestBank ? bestBank.netSavings : 0);
+                    html = `
+                        <div class="bg-indigo-500/20 border border-indigo-400/30 rounded-lg p-4 mb-2">
+                             <div class="text-indigo-300 font-bold text-lg mb-1">${this.t('retentionWin')} 🏠</div>
+                             <p class="text-sm text-slate-300 mb-2">${this.t('recommendationRetention')}</p>
+                             <div class="text-2xl font-bold text-white mb-1">${this.formatMoney(retSavings)}</div>
+                             ${bestBank ? `<div class="text-xs text-indigo-200 bg-indigo-900/30 inline-block px-2 py-1 rounded">
+                                ${this.t('savingVsRetention', { amount: this.formatMoney(diff) })}
+                             </div>` : ''}
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
+            },
+
+            // --- Storage ---
+            saveProject(asNew = true) {
+                const name = document.getElementById('projectName').value || 'Untitled Project';
+                const project = {
+                    name,
+                    date: new Date().toISOString(),
+                    data: this.data,
+                    lang: this.lang
+                };
+
+                let projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
+
+                if (!asNew && this.loadedProjectIndex > -1 && projects[this.loadedProjectIndex]) {
+                    // Update existing
+                    projects[this.loadedProjectIndex] = project;
+                    this.showToast(this.t('projectUpdated'), 'success');
+                } else {
+                    // Save as new
+                    projects.push(project);
+                    // Update index to the new one
+                    this.loadedProjectIndex = projects.length - 1;
+                    this.showToast(this.t('projectSaved'), 'success');
+                }
+
+                localStorage.setItem('mortgage_projects', JSON.stringify(projects));
+
+                document.getElementById('saveModal').classList.add('hidden');
+                document.getElementById('projectName').value = '';
+            },
+
+            loadFromStorage() {
+                // Try to restore last state if exists? Or just init clean
+            },
+
+            showSaveModal() {
+                const nameInput = document.getElementById('projectName');
+                const btnUpdate = document.getElementById('btnUpdateProject');
+                const btnSave = document.getElementById('btnSaveNewProject');
+
+                if (this.loadedProjectIndex > -1) {
+                    // If project is loaded, try to find name
+                    const projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
+                    const current = projects[this.loadedProjectIndex];
+                    if (current) {
+                        nameInput.value = current.name;
+                    }
+
+                    btnUpdate.classList.remove('hidden');
+                    // Set key to saveNew
+                    btnSave.setAttribute('data-i18n', 'saveNew');
+                    btnSave.textContent = this.t('saveNew');
+                } else {
+                    nameInput.value = '';
+                    btnUpdate.classList.add('hidden');
+                    // Set key to save
+                    btnSave.setAttribute('data-i18n', 'save');
+                    btnSave.textContent = this.t('save');
+                }
+
+                document.getElementById('saveModal').classList.remove('hidden');
+            },
+
+            showLoadModal() {
+                const list = document.getElementById('savedProjectsList');
+                const projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
+
+                if (projects.length === 0) {
+                    list.innerHTML = `<div class="text-center text-slate-400 py-4">No saved projects</div>`;
+                } else {
+                    list.innerHTML = projects.map((p, idx) => `
+                        <div class="flex justify-between items-center p-3 hover:bg-slate-50 border-b border-slate-100 last:border-0 cursor-pointer group">
+                            <div onclick="app.loadProject(${idx})" class="flex-grow">
+                                <div class="font-semibold text-slate-700 ${idx === this.loadedProjectIndex ? 'text-blue-600' : ''}">${p.name} ${idx === this.loadedProjectIndex ? '(Current)' : ''}</div>
+                                <div class="text-xs text-slate-400">${new Date(p.date).toLocaleDateString()} ${new Date(p.date).toLocaleTimeString()}</div>
+                            </div>
+                            <button onclick="app.deleteProject(${idx})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+
+                document.getElementById('loadModal').classList.remove('hidden');
+            },
+
+            // --- Helper to update inputs from state ---
+            populateInputs() {
+                const fields = [
+                    'currentBalance', 'monthlyPayment', 'currentRate',
+                    'retentionRate1', 'retentionRate2', 'retentionRate3', 'retentionFee'
+                ];
+
+                fields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = this.data[id] === undefined ? '' : this.data[id];
+                });
+
+                // Legacy Support in data: Ensure newer fields exist
+                this.data.banks.forEach(bank => {
+                    if (bank.feeMortgage === undefined) bank.feeMortgage = null;
+                    if (bank.feeStamp === undefined) bank.feeStamp = null;
+                });
+            },
+
+            loadProject(index) {
+                const projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
+                if (projects[index]) {
+                    this.loadedProjectIndex = index; // FIX: Track loaded index
+                    this.data = projects[index].data;
+                    this.lang = projects[index].lang || 'th';
+                    localStorage.setItem('mortgage_lang', this.lang);
+
+                    this.populateInputs();
+
+                    this.calculateData();
+                    this.render(); // Need full render because input values in list might have changed
+                    document.getElementById('loadModal').classList.add('hidden');
+                }
+            },
+
+            deleteProject(index) {
+                this.showConfirmDialog(
+                    this.lang === 'th' ? 'ลบโปรเจค' : 'Delete Project',
+                    this.lang === 'th' ? 'ต้องการลบโปรเจคนี้?' : 'Delete this project?',
+                    () => {
+                        let projects = JSON.parse(localStorage.getItem('mortgage_projects') || '[]');
+                        projects.splice(index, 1);
+                        localStorage.setItem('mortgage_projects', JSON.stringify(projects));
+
+                        if (this.loadedProjectIndex === index) this.loadedProjectIndex = -1;
+                        else if (this.loadedProjectIndex > index) this.loadedProjectIndex--;
+
+                        this.showLoadModal();
+                        this.showToast(this.lang === 'th' ? 'ลบเรียบร้อย' : 'Deleted', 'success');
+                    }
+                );
+            },
+
+            // --- Sharing ---
+            showShareModal() {
+                const json = JSON.stringify(this.data);
+                // Use LZString to compress, then Base64 encode safe for URL
+                const compressed = LZString.compressToEncodedURIComponent(json);
+                const url = `${window.location.origin}${window.location.pathname}?data=${compressed}`;
+
+                document.getElementById('shareUrlInput').value = url;
+
+                // Generate QR
+                new QRious({
+                    element: document.getElementById('qrCanvas'),
+                    value: url,
+                    size: 180,
+                    level: 'H'
+                });
+
+                document.getElementById('shareModal').classList.remove('hidden');
+            },
+
+            copyShareUrl() {
+                const input = document.getElementById('shareUrlInput');
+                input.select();
+                document.execCommand('copy'); // Fallback
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(input.value);
+                }
+                this.showToast(this.t('copied'), 'success');
+            },
+
+            loadFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const dataParam = params.get('data');
+                if (dataParam) {
+                    try {
+                        const json = LZString.decompressFromEncodedURIComponent(dataParam);
+                        if (json) {
+                            const parsed = JSON.parse(json);
+                            this.data = { ...this.data, ...parsed }; // Merge to ensure fields exist
+                            this.loadedFromUrl = true;
+                            // Clean URL without reload
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    } catch (e) {
+                        console.error("Failed to load data from URL", e);
+                        this.showToast('Failed to load project from URL', 'error');
+                    }
+                }
+            },
+
+            // --- UI Utilities ---
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+
+                // Colors based on type
+                let bgClass = 'bg-slate-800';
+                if (type === 'success') bgClass = 'bg-green-600';
+                if (type === 'error') bgClass = 'bg-red-600';
+
+                toast.className = `${bgClass} text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 toast-enter pointer-events-auto`;
+
+                let icon = '';
+                if (type === 'success') icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                else if (type === 'error') icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                else icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+                toast.innerHTML = `${icon} <span class="font-medium text-sm text-center">${message}</span>`;
+
+                container.appendChild(toast);
+
+                // Auto remove
+                setTimeout(() => {
+                    toast.classList.remove('toast-enter');
+                    toast.classList.add('toast-exit');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            },
+
+            confirmCallback: null,
+
+            showConfirmDialog(title, message, onConfirm) {
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+                document.getElementById('confirmModal').classList.remove('hidden');
+
+                // Store callback
+                this.confirmCallback = onConfirm;
+
+                // Bind Main Button
+                const btn = document.getElementById('confirmBtn');
+                btn.onclick = () => {
+                    if (this.confirmCallback) this.confirmCallback();
+                    this.closeConfirmModal();
+                };
+            },
+
+            closeConfirmModal() {
+                document.getElementById('confirmModal').classList.add('hidden');
+                this.confirmCallback = null;
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+
+</html>
