@@ -123,19 +123,26 @@
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-white border-b border-slate-200 py-4 mb-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                    </path>
-                </svg>
-                <h1 class="text-xl md:text-2xl font-bold tracking-tight" data-i18n="appTitle">Mortgage Tool</h1>
+                <div class="bg-blue-600 w-10 h-10 flex items-center justify-center rounded-xl shadow-md text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-800 leading-none" data-i18n="appTitle">
+                        HomeFin Insight</h1>
+                    <p class="text-[10px] text-slate-500 font-medium tracking-wide uppercase">Smart Mortgage Calculator
+                    </p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <button onclick="app.toggleLang()"
-                    class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-sm font-medium transition backdrop-blur-sm border border-white/10 shadow-sm">
+                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 px-4 py-2 rounded-full text-xs font-bold transition border border-slate-200">
                     <span id="lang-display">TH | EN</span>
                 </button>
             </div>
@@ -143,7 +150,8 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
         <!-- Left Column: Inputs & Retention (3 cols) -->
         <div class="lg:col-span-3 space-y-6">
